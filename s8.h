@@ -15,7 +15,10 @@ struct s8_t {
     char *str;
 };
 
+// usage: s8 str = S8_LIT("a string literal");
 #define S8_LIT(s) (s8) {.len = sizeof((s)) - 1, .str = (char*) (s)}
+
+// usage: printf("this is an s8 string: "p_s8"\n", S8_FMT(s));
 #define S8_FMT(s) (int) (s).len, (s).str
 #define p_s8 "%.*s"
 
