@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <unistd.h>
+#define S8_IMPLEMENTATION
 #include "s8.h"
 
 int main(void)

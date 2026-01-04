@@ -1,12 +1,9 @@
 /*
  *
- *
- *
- *
- *
  */
 
-#include <stdlib.h>
+#ifndef S8_H_
+#define S8_H_
 
 typedef struct s8_t s8;
 
@@ -22,16 +19,26 @@ struct s8_t {
 #define S8_FMT(s) (int) (s).len, (s).str
 #define p_s8 "%.*s"
 
-/* declarations */
-s8 s8_strstr(s8 haystack, s8 needle);
-size_t s8_strlen(s8 s);
-s8 s8_strdup(s8 s);
-int s8_strcmp(s8 s1, s8 s2);
-s8 s8_strcat(s8 prefix, s8 suffix);
-void s8_free(s8 s);
+void s8_print(s8 s);
 s8 s8_buf(char buf[], size_t len);
+void s8_free(s8 s);
+s8 s8_strcat(s8 prefix, s8 suffix);
+int s8_strcmp(s8 s1, s8 s2);
+s8 s8_strdup(s8 s);
+size_t s8_strlen(s8 s);
+s8 s8_strstr(s8 haystack, s8 needle);
 
-/* implementations*/
+#endif // S8_H_
+
+#ifdef S8_IMPLEMENTATION
+#include <stdlib.h>
+
+
+void s8_print(s8 s)
+{
+    printf(p_s8, S8_FMT(s));
+}
+
 /* Create s8 from buffer. Dynamically allocates string.
  * Returns empty s8 on failure. */
 s8 s8_buf(char buf[], size_t len)
@@ -115,3 +122,18 @@ s8 s8_strstr(s8 haystack, s8 needle)
     if (j == needle.len) return (s8) {.len = needle.len, .str = haystack.str + i - j};
     return (s8) {.len = 0, .str = NULL};
 }
+
+#endif // S8_IMPLEMENTATION
+
+#ifdef S8_STRIP_PREFIX
+
+#define print s8_print
+// #define buf s8_buf
+// #define free s8_free
+#define strcat s8_strcat
+#define strcmp s8_strcmp
+#define strdup s8_strdup
+#define strlen s8_strlen
+#define strstr s8_strstr
+
+#endif // S8_STRIP_PREFIX
