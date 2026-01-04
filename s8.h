@@ -12,6 +12,11 @@ struct s8_t {
     char *str;
 };
 
+static struct {
+    size_t idx;
+    s8 *s;
+} _s8_strtok_state;
+
 // usage: s8 str = S8_LIT("a string literal");
 #define S8_LIT(s) (s8) {.len = sizeof((s)) - 1, .str = (char*) (s)}
 
@@ -22,11 +27,14 @@ struct s8_t {
 void s8_print(s8 s);
 s8 s8_buf(char buf[], size_t len);
 void s8_free(s8 s);
+s8 s8_null();
 s8 s8_strcat(s8 prefix, s8 suffix);
 int s8_strcmp(s8 s1, s8 s2);
 s8 s8_strdup(s8 s);
 size_t s8_strlen(s8 s);
 s8 s8_strstr(s8 haystack, s8 needle);
+s8 s8_strchr(s8 s, char c);
+s8 s8_strtok(s8 s, s8 delim);
 
 #endif // S8_H_
 
@@ -62,6 +70,11 @@ s8 s8_buf(char buf[], size_t len)
 void s8_free(s8 s)
 {
     free(s.str);
+}
+
+s8 s8_null()
+{
+    return (s8) {.len = 0, .str = NULL};
 }
 
 /* Creates s8 struct with concatenated prefix and suffix.
@@ -123,6 +136,31 @@ s8 s8_strstr(s8 haystack, s8 needle)
     return (s8) {.len = 0, .str = NULL};
 }
 
+s8 s8_strchr(s8 s, char c)
+{
+    size_t i = 0;
+    for (; i < s.len; i++) {
+        if (s.str[i] == c) return (s8) {.len = s.len - i, .str = &s.str[i]};
+    }
+    return s8_null();
+}
+
+s8 s8_strtok(s8 s, s8 delim)
+{
+    if (s.len) {
+        _s8_strtok_state.s = &s;
+        _s8_strtok_state.idx = 0;
+    }
+    if (_s8_strtok_state.idx >= _s8_strtok_state.s->len) return s8_null();
+    size_t start = _s8_strtok_state.idx;
+    size_t end = start;
+    for (; end < _s8_strtok_state.s->len; end++) {
+        if (s8_strchr(delim, _s8_strtok_state.s->str[end]).len) break;
+    }
+    _s8_strtok_state.idx = end;
+    return (s8) {.len = end - start, .str = &_s8_strtok_state.s->str[_s8_strtok_state.idx]};
+}
+
 #endif // S8_IMPLEMENTATION
 
 #ifdef S8_STRIP_PREFIX
@@ -130,10 +168,13 @@ s8 s8_strstr(s8 haystack, s8 needle)
 #define print s8_print
 // #define buf s8_buf
 // #define free s8_free
+// #define null s8_null
 #define strcat s8_strcat
 #define strcmp s8_strcmp
 #define strdup s8_strdup
 #define strlen s8_strlen
 #define strstr s8_strstr
+#define strchr s8_strchr
+#define strtok s8_strtok
 
 #endif // S8_STRIP_PREFIX
