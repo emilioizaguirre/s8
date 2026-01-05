@@ -12,11 +12,6 @@ struct s8_t {
     char *str;
 };
 
-static struct {
-    size_t idx;
-    s8 *s;
-} _s8_strtok_state;
-
 // usage: s8 str = S8_LIT("a string literal");
 #define S8_LIT(s) (s8) {.len = sizeof((s)) - 1, .str = (char*) (s)}
 
@@ -25,6 +20,7 @@ static struct {
 #define p_s8 "%.*s"
 
 void s8_print(s8 s);
+void s8_print_nl(s8 s);
 s8 s8_buf(char buf[], size_t len);
 void s8_free(s8 s);
 s8 s8_null();
@@ -41,10 +37,24 @@ s8 s8_strtok(s8 s, s8 delim);
 #ifdef S8_IMPLEMENTATION
 #include <stdlib.h>
 
+struct _s8_strtok_state_t {
+    size_t idx;
+    s8 *s;
+};
+
+static struct _s8_strtok_state_t _s8_strtok_state = {
+    .idx = 0,
+    .s = NULL
+};
 
 void s8_print(s8 s)
 {
     printf(p_s8, S8_FMT(s));
+}
+
+void s8_print_nl(s8 s)
+{
+    printf(p_s8"\n", S8_FMT(s));
 }
 
 /* Create s8 from buffer. Dynamically allocates string.
@@ -158,7 +168,7 @@ s8 s8_strtok(s8 s, s8 delim)
         if (s8_strchr(delim, _s8_strtok_state.s->str[end]).len) break;
     }
     _s8_strtok_state.idx = end;
-    return (s8) {.len = end - start, .str = &_s8_strtok_state.s->str[_s8_strtok_state.idx]};
+    return (s8) {.len = end - start, .str = &_s8_strtok_state.s->str[start]};
 }
 
 #endif // S8_IMPLEMENTATION
