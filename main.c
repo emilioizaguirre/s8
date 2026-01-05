@@ -30,9 +30,12 @@ int main(void)
     s8_print_nl(find_p);
     printf("%ld\n", find_p.len);
 
-    s8 string_to_tokenize = S8_LIT("this is some long string");
-    for (s8 t = s8_strtok(string_to_tokenize, S8_LIT(" ")); t.len; t = s8_strtok(s8_null(), S8_LIT(" "))) {
+    s8 string_to_tokenize = S8_LIT("what the, hell is, going on in there");
+    s8 delim = S8_LIT(", ");
+    for (s8 t = s8_strtok(&string_to_tokenize, delim); t.len; t = s8_strtok(NULL, delim)) {
+        printf("%ld: ", t.len);
         s8_print_nl(t);
     }
+
     return 0;
 }
