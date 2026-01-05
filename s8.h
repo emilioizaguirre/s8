@@ -157,18 +157,24 @@ s8 s8_strchr(s8 s, char c)
 
 s8 s8_strtok(s8 s, s8 delim)
 {
-    if (s.len) {
+    if (s.len != 0) {
         _s8_strtok_state.s = &s;
         _s8_strtok_state.idx = 0;
     }
     if (_s8_strtok_state.idx >= _s8_strtok_state.s->len) return s8_null();
     size_t start = _s8_strtok_state.idx;
-    size_t end = start;
-    for (; end < _s8_strtok_state.s->len; end++) {
-        if (s8_strchr(delim, _s8_strtok_state.s->str[end]).len) break;
+    for (; _s8_strtok_state.idx < _s8_strtok_state.s->len; _s8_strtok_state.idx++) {
+        if (s8_strchr(delim, _s8_strtok_state.s->str[_s8_strtok_state.idx]).len /* state.s[state.idx] in delim */) break;
     }
-    _s8_strtok_state.idx = end;
-    return (s8) {.len = end - start, .str = &_s8_strtok_state.s->str[start]};
+    return (s8) {.len = _s8_strtok_state.idx - start, .str = &((_s8_strtok_state.s->str)[start])};
+    // if (_s8_strtok_state.idx >= _s8_strtok_state.s->len) return s8_null();
+    // size_t start = _s8_strtok_state.idx;
+    // size_t end = start;
+    // for (; end < _s8_strtok_state.s->len; end++) {
+    //     if (s8_strchr(delim, _s8_strtok_state.s->str[end]).len) break;
+    // }
+    // _s8_strtok_state.idx = end;
+    // return (s8) {.len = end - start, .str = &_s8_strtok_state.s->str[start]};
 }
 
 #endif // S8_IMPLEMENTATION
