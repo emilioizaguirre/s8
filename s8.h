@@ -30,7 +30,7 @@ s8 s8_strdup(s8 s);
 size_t s8_strlen(s8 s);
 s8 s8_strstr(s8 haystack, s8 needle);
 s8 s8_strchr(s8 s, char c);
-s8 s8_strtok(s8 s, s8 delim);
+s8 s8_strtok(s8 *s, s8 delim);
 
 #endif // S8_H_
 
@@ -42,10 +42,7 @@ struct _s8_strtok_state_t {
     s8 *s;
 };
 
-static struct _s8_strtok_state_t _s8_strtok_state = {
-    .idx = 0,
-    .s = NULL
-};
+static struct _s8_strtok_state_t _s8_strtok_state = { 0 };
 
 void s8_print(s8 s)
 {
@@ -155,26 +152,24 @@ s8 s8_strchr(s8 s, char c)
     return s8_null();
 }
 
-s8 s8_strtok(s8 s, s8 delim)
+s8 s8_strtok(s8 *s, s8 delim)
 {
-    if (s.len != 0) {
-        _s8_strtok_state.s = &s;
+    if (s) {
+        _s8_strtok_state.s = s;
         _s8_strtok_state.idx = 0;
     }
     if (_s8_strtok_state.idx >= _s8_strtok_state.s->len) return s8_null();
     size_t start = _s8_strtok_state.idx;
+    // loop through string to next delim
     for (; _s8_strtok_state.idx < _s8_strtok_state.s->len; _s8_strtok_state.idx++) {
-        if (s8_strchr(delim, _s8_strtok_state.s->str[_s8_strtok_state.idx]).len /* state.s[state.idx] in delim */) break;
+        if (s8_strchr(delim, _s8_strtok_state.s->str[_s8_strtok_state.idx]).len) break;
     }
-    return (s8) {.len = _s8_strtok_state.idx - start, .str = &((_s8_strtok_state.s->str)[start])};
-    // if (_s8_strtok_state.idx >= _s8_strtok_state.s->len) return s8_null();
-    // size_t start = _s8_strtok_state.idx;
-    // size_t end = start;
-    // for (; end < _s8_strtok_state.s->len; end++) {
-    //     if (s8_strchr(delim, _s8_strtok_state.s->str[end]).len) break;
-    // }
-    // _s8_strtok_state.idx = end;
-    // return (s8) {.len = end - start, .str = &_s8_strtok_state.s->str[start]};
+    size_t end = _s8_strtok_state.idx;
+    // loop through rest of string to next non-delim
+    for (; _s8_strtok_state.idx < _s8_strtok_state.s->len; _s8_strtok_state.idx++) {
+        if (!s8_strchr(delim, _s8_strtok_state.s->str[_s8_strtok_state.idx]).len) break;
+    }
+    return (s8) {.len = end - start, .str = &_s8_strtok_state.s->str[start]};
 }
 
 #endif // S8_IMPLEMENTATION
