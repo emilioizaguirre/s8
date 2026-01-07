@@ -12,8 +12,10 @@ struct s8_t {
     char *str;
 };
 
+#define S8_NULL (s8) { 0 }
+
 // usage: s8 str = S8_LIT("a string literal");
-#define S8_LIT(s) (s8) {.len = sizeof((s)) - 1, .str = (char*) (s)}
+#define S8_LIT(s) (s8) {.len = sizeof((s)) - 1, .str = (char *)(s)}
 
 // usage: printf("this is an s8 string: "p_s8"\n", S8_FMT(s));
 #define S8_FMT(s) (int) (s).len, (s).str
@@ -23,7 +25,6 @@ void s8_print(s8 s);
 void s8_print_nl(s8 s);
 s8 s8_buf(char buf[], size_t len);
 void s8_free(s8 s);
-s8 s8_null();
 s8 s8_strcat(s8 prefix, s8 suffix);
 int s8_strcmp(s8 s1, s8 s2);
 s8 s8_strdup(s8 s);
@@ -58,14 +59,14 @@ void s8_print_nl(s8 s)
  * Returns empty s8 on failure. */
 s8 s8_buf(char buf[], size_t len)
 {
-    if (len == 0) return (s8) { 0 };
+    if (len == 0) return S8_NULL;
 
     size_t i = 0, j = 0;
     for (; i < len && buf[i]; i++) { }
-    if (i == 0) return (s8) { 0 };
+    if (i == 0) return S8_NULL;
 
     char *str = malloc(i);
-    if (!str) return (s8) { 0 };
+    if (!str) return S8_NULL;
 
     for (; j < i && buf[j]; j++) {
         str[j] = buf[j];
@@ -79,18 +80,13 @@ void s8_free(s8 s)
     free(s.str);
 }
 
-s8 s8_null()
-{
-    return (s8) { 0 };
-}
-
 /* Creates s8 struct with concatenated prefix and suffix.
  * String is dynamically allocated.
  * Returns empty s8 on failure. */
 s8 s8_strcat(s8 prefix, s8 suffix)
 {
     char *str = malloc(prefix.len + suffix.len);
-    if (!str) return (s8) { 0 };
+    if (!str) return S8_NULL;
     for (size_t i = 0; i < prefix.len; i++) {
         str[i] = prefix.str[i];
     }
@@ -115,7 +111,7 @@ int s8_strcmp(s8 s1, s8 s2)
 s8 s8_strdup(s8 s)
 {
     char *str = malloc(s.len);
-    if (!str) return (s8) { 0 };
+    if (!str) return S8_NULL;
     for (size_t i = 0; i < s.len; i++) {
         str[i] = s.str[i];
     }
@@ -140,7 +136,7 @@ s8 s8_strstr(s8 haystack, s8 needle)
     }
 
     if (j == needle.len) return (s8) {.len = needle.len, .str = haystack.str + i - j};
-    return (s8) { 0 };
+    return S8_NULL;
 }
 
 s8 s8_strchr(s8 s, char c)
@@ -149,7 +145,7 @@ s8 s8_strchr(s8 s, char c)
     for (; i < s.len; i++) {
         if (s.str[i] == c) return (s8) {.len = s.len - i, .str = &s.str[i]};
     }
-    return s8_null();
+    return S8_NULL;
 }
 
 s8 s8_strtok(s8 *s, s8 delim)
@@ -158,7 +154,7 @@ s8 s8_strtok(s8 *s, s8 delim)
         _s8_strtok_state.s = s;
         _s8_strtok_state.idx = 0;
     }
-    if (_s8_strtok_state.idx >= _s8_strtok_state.s->len) return s8_null();
+    if (_s8_strtok_state.idx >= _s8_strtok_state.s->len) return S8_NULL;
     size_t start = _s8_strtok_state.idx;
     // loop through string to next delim
     for (; _s8_strtok_state.idx < _s8_strtok_state.s->len; _s8_strtok_state.idx++) {
@@ -179,7 +175,6 @@ s8 s8_strtok(s8 *s, s8 delim)
 #define print s8_print
 // #define buf s8_buf
 // #define free s8_free
-// #define null s8_null
 #define strcat s8_strcat
 #define strcmp s8_strcmp
 #define strdup s8_strdup
