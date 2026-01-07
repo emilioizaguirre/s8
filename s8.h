@@ -58,14 +58,14 @@ void s8_print_nl(s8 s)
  * Returns empty s8 on failure. */
 s8 s8_buf(char buf[], size_t len)
 {
-    if (len == 0) return (s8) {.len = 0, .str = NULL};
+    if (len == 0) return (s8) { 0 };
 
     size_t i = 0, j = 0;
     for (; i < len && buf[i]; i++) { }
-    if (i == 0) return (s8) {.len = 0, .str = NULL};
+    if (i == 0) return (s8) { 0 };
 
     char *str = malloc(i);
-    if (!str) return (s8) {.len = 0, .str = NULL};
+    if (!str) return (s8) { 0 };
 
     for (; j < i && buf[j]; j++) {
         str[j] = buf[j];
@@ -81,7 +81,7 @@ void s8_free(s8 s)
 
 s8 s8_null()
 {
-    return (s8) {.len = 0, .str = NULL};
+    return (s8) { 0 };
 }
 
 /* Creates s8 struct with concatenated prefix and suffix.
@@ -90,7 +90,7 @@ s8 s8_null()
 s8 s8_strcat(s8 prefix, s8 suffix)
 {
     char *str = malloc(prefix.len + suffix.len);
-    if (!str) return (s8) {.len = 0, .str = NULL};
+    if (!str) return (s8) { 0 };
     for (size_t i = 0; i < prefix.len; i++) {
         str[i] = prefix.str[i];
     }
@@ -115,7 +115,7 @@ int s8_strcmp(s8 s1, s8 s2)
 s8 s8_strdup(s8 s)
 {
     char *str = malloc(s.len);
-    if (!str) return (s8) {.len = 0, .str = NULL};
+    if (!str) return (s8) { 0 };
     for (size_t i = 0; i < s.len; i++) {
         str[i] = s.str[i];
     }
@@ -140,7 +140,7 @@ s8 s8_strstr(s8 haystack, s8 needle)
     }
 
     if (j == needle.len) return (s8) {.len = needle.len, .str = haystack.str + i - j};
-    return (s8) {.len = 0, .str = NULL};
+    return (s8) { 0 };
 }
 
 s8 s8_strchr(s8 s, char c)
